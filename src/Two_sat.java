@@ -48,7 +48,7 @@ public class Two_sat {
         if(nmbr == 1){
             Object satisfiable;
             System.out.println("Number of available processors is " + nmbr);
-            Solve solve = new Solve((LinkedList<Integer[]>)this.clauses,
+            Solve solve = new Solve((LinkedList<Integer[]>) this.clauses,
                     this.read.numberOfBooleanVariables, -1, 1);
 
             Runnable task = () -> {
@@ -96,6 +96,9 @@ public class Two_sat {
 
             Solve solve1 = new Solve((LinkedList<Integer[]>)this.clauses,
                     this.read.numberOfBooleanVariables, 1, 2);
+
+
+
 
             Callable<Boolean> task = () -> {
                 try {
@@ -211,9 +214,6 @@ public class Two_sat {
             executor.shutdown();
 
 
-
-
-
         }
         else{
             System.out.println("tuna si");
@@ -294,18 +294,37 @@ public class Two_sat {
 
     }
 
+
+    /* PUBLIC METHODS */
+    public void solveEsat() throws IOException {
+
+        /* read clauses */
+        this.read = new Read_and_save();
+
+        this.clauses = read.readClauses(this.filename, false, this.read.readNumberOfClauses(this.filename));
+
+        ConcurentSolution concur = new ConcurentSolution((LinkedList<Integer[]>) this.clauses,
+                this.read.numberOfBooleanVariables);
+
+        concur.solve();
+
+    }
+
+
     /* MAIN METHOD */
     /* the main method, where the two sat solution is executed */
     public static void main(String[] args) throws NoSuchFieldException, IOException{
         /* initialize class TwoSat */
-        Two_sat two_sat = new Two_sat("2sat2.txt");
+        Two_sat two_sat = new Two_sat("2sat6.txt");
 
         /* solve */
         //two_sat.solve2sat(true, false);
 
 
         /* solve */
-        //two_sat.solve2sat(true, false);
-        two_sat.solve2sat();
+        //two_sat.solve2sat(true, true);
+        //two_sat.solve2sat();
+
+        two_sat.solveEsat();
     }
 }

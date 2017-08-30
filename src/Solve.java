@@ -14,6 +14,10 @@ import java.util.Random;
  * */
 public class Solve {
     /* STATIC FIELDS */
+    private static int COUNT = 0;
+    private static long startTime;
+
+
     private Random rand;
 
     /* LOCAL FIELDS*/
@@ -33,6 +37,7 @@ public class Solve {
         this.numberOfProcessors = 1;
         this.numberOfBooleanVariables = numberOfBooleanVariables;
 
+        Solve.startTime = System.currentTimeMillis();
     }
 
     public Solve(List<Integer[]> clauses, Integer numberOfBooleanVariables, Integer seed,
@@ -43,6 +48,9 @@ public class Solve {
         this.assignments = new HashMap<>(clauses.size());
         this.numberOfProcessors = numberOfProcessors;
         this.numberOfBooleanVariables = numberOfBooleanVariables;
+
+        Solve.startTime = System.currentTimeMillis();
+
 
     }
 
@@ -57,13 +65,23 @@ public class Solve {
 
 
     /* PRIVATE METHODS */
-    private boolean distribution() throws NoSuchFieldException{
+    private boolean distribution(Integer index) throws NoSuchFieldException{
         /* if seed is  -1, the distribution is uniform */
-        if(this.seed == -1){
+        if(index<((this.seed%this.numberOfProcessors))*this.numberOfBooleanVariables.floatValue()/this.numberOfProcessors){
             /* this means that at the beginning all boolean variables are false */
+            /*
+            System.out.println("here A " + index);
+            System.out.println(((this.seed%this.numberOfProcessors))*this.numberOfBooleanVariables.floatValue()/this.numberOfProcessors);
+            System.out.println("---------");
+            */
             return false;
         }
         else{
+            /*
+            System.out.println("here B " + index);
+            System.out.println(((this.seed%this.numberOfProcessors))*this.numberOfBooleanVariables.floatValue()/this.numberOfProcessors);
+            System.out.println("---------");
+            */
             /* this means that the initial state is distributed all as true */
             return true;
         }
@@ -74,7 +92,7 @@ public class Solve {
     private boolean value(Integer index) throws NoSuchFieldException{
 
         if(!this.assignments.keySet().contains(index)){
-            return this.distribution();
+            return this.distribution(index);
         }
         else{
             return this.assignments.get(index);
@@ -147,11 +165,11 @@ public class Solve {
                 /* change ONE of the boolean variables in breaking clause, pick one UNIFORMLY @ RANDOM */
                 if(randInt(0, 1) < 0.5){
                     /* change the first assigned value to the opposite */
-                    this.assignments.put(Math.abs(clause[0]), !this.value(clause[0]));
+                    this.assignments.put(Math.abs(clause[0]), !this.value(Math.abs(clause[0])));
                 }
                 else{
                     /* change the second assigned value to the opposite */
-                    this.assignments.put(Math.abs(clause[1]), !this.value(clause[1]));
+                    this.assignments.put(Math.abs(clause[1]), !this.value(Math.abs(clause[1])));
                 }
                 return false;
             }
@@ -170,17 +188,16 @@ public class Solve {
         /* repeat 2 * n^2 times @ MAX */
         //System.out.println("NUMBER OF TASKS: " + 2*Math.pow(this.numberOfBooleanVariables, 2));
 
-        long startTime = System.currentTimeMillis();
 
         for(int i = 0;
             i < Math.ceil(2*Math.pow(this.numberOfBooleanVariables, 2)/this.numberOfProcessors.doubleValue()); i++ ){
-
-            if(i%15000==0) {
-                System.out.println("you are doing number " + i);
-                long estimatedTime = System.currentTimeMillis() - startTime;
+            Solve.COUNT++;
+            if(Solve.COUNT%20000==0) {
+                System.out.println("you are doing number " + Solve.COUNT);
+                long estimatedTime = System.currentTimeMillis() - Solve.startTime;
 
                 System.out.println("the time elapsed in milliseconds for concurrent solution: " + estimatedTime);
-                startTime = System.currentTimeMillis();
+                Solve.startTime = System.currentTimeMillis();
             }
 
 

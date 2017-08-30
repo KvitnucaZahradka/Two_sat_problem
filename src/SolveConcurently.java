@@ -153,7 +153,7 @@ public class SolveConcurently {
             executor.shutdown();
 
             //System.out.println("the number of iterations " + 2*Math.pow(this.numberOfBooleanVariables, 2) );
-            if(counter%15000==0) {
+            if(counter%20000==0) {
                 System.out.println("you are doing number " + counter);
                 long estimatedTime = System.currentTimeMillis() - startTime;
 
